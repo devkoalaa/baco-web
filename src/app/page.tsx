@@ -1,5 +1,5 @@
-import DashboardPage from "./dashboard/page";
+import TestePage from './teste/page'
 
 export default function Home() {
-  return <DashboardPage />;
+  return <div>Home</div>
 }
