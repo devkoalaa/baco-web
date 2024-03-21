@@ -5,16 +5,17 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from '@/components/ui/resizable'
-import { Separator } from '@radix-ui/react-dropdown-menu'
-import { TooltipProvider } from '@radix-ui/react-tooltip'
+import { Separator } from '@/components/ui/separator'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { AlertCircle, Banknote, Box, Users2 } from 'lucide-react'
 import { Inter as FontSans } from 'next/font/google'
 import { ReactNode, useState } from 'react'
 import '../app/globals.css'
 import { cn } from '../lib/utils'
-import { AccountSwitcher } from './mail/components/account-switcher'
-import { Nav } from './mail/components/nav'
-import { accounts } from './mail/data'
+import { AccountSwitcher } from '@/components/account-switcher'
+import { Nav } from '@/components/nav'
+import { accounts } from '@/utils/data'
+import { getCookie } from '@/utils/getCookie'
 
 export const fontSans = FontSans({
   subsets: ['latin'],
@@ -26,11 +27,16 @@ export default function RootLayout({
 }: Readonly<{
   children: ReactNode
 }>) {
-  const [defaultCollapsed, setDefaultCollapsed] = useState(false)
-  const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed)
-  const defaultLayout = [265, 440, 655]
   const navCollapsedSize = 4
-  const [painel, setPainel] = useState(true)
+  const layoutCookie = JSON.parse(getCookie('react-resizable-panels:layout'))
+  const collapsedCookie = JSON.parse(
+    getCookie('react-resizable-panels:collapsed'),
+  )
+  console.log('collapsedCookie', collapsedCookie)
+  console.log('collapsedCookie typeof', typeof collapsedCookie)
+  const defaultLayout = layoutCookie
+  const defaultCollapsed = false
+  const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed)
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -47,93 +53,92 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="">
-            <TooltipProvider delayDuration={0}>
-              <ResizablePanelGroup
-                direction="horizontal"
-                onLayout={(sizes: number[]) => {
-                  document.cookie = `react-resizable-panels:layout=${JSON.stringify(
-                    sizes,
+          <TooltipProvider delayDuration={0}>
+            <ResizablePanelGroup
+              direction="horizontal"
+              onLayout={(sizes: number[]) => {
+                // console.log(sizes)
+                document.cookie = `react-resizable-panels:layout=${JSON.stringify(
+                  sizes,
+                )}`
+              }}
+              className="h-full max-h-[800px] items-stretch"
+            >
+              <ResizablePanel
+                defaultSize={defaultLayout[0]}
+                collapsedSize={navCollapsedSize}
+                collapsible={true}
+                minSize={15}
+                maxSize={20}
+                onCollapse={(collapsed: any) => {
+                  setIsCollapsed(collapsed)
+                  document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
+                    collapsed,
                   )}`
                 }}
-                className="h-full max-h-[800px] items-stretch"
+                className={cn(
+                  isCollapsed &&
+                    'min-w-[50px] transition-all duration-300 ease-in-out',
+                )}
               >
-                <ResizablePanel
-                  defaultSize={defaultLayout[0]}
-                  collapsedSize={navCollapsedSize}
-                  collapsible={true}
-                  minSize={15}
-                  maxSize={20}
-                  onCollapse={(collapsed: any) => {
-                    setIsCollapsed(collapsed)
-                    document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
-                      collapsed,
-                    )}`
-                  }}
+                <div
                   className={cn(
-                    isCollapsed &&
-                      'min-w-[50px] transition-all duration-300 ease-in-out',
+                    'flex h-[52px] items-center justify-center',
+                    isCollapsed ? 'h-[52px]' : 'px-2',
                   )}
                 >
-                  <div
-                    className={cn(
-                      'flex h-[52px] items-center justify-center',
-                      isCollapsed ? 'h-[52px]' : 'px-2',
-                    )}
-                  >
-                    <AccountSwitcher
-                      isCollapsed={isCollapsed}
-                      accounts={accounts}
-                    />
-                  </div>
-                  <Separator />
-                  <Nav
+                  <AccountSwitcher
                     isCollapsed={isCollapsed}
-                    links={[
-                      {
-                        title: 'Produtos',
-                        label: '128',
-                        icon: Box,
-                        variant: 'default',
-                      },
-                      {
-                        title: 'Vendas',
-                        label: '0',
-                        icon: Banknote,
-                        variant: 'ghost',
-                      },
-                    ]}
+                    accounts={accounts}
                   />
-                  <Separator />
-                  <Nav
-                    isCollapsed={isCollapsed}
-                    links={[
-                      {
-                        title: 'Usuários',
-                        label: '2',
-                        icon: Users2,
-                        variant: 'ghost',
-                      },
-                      {
-                        title: 'Updates',
-                        label: '0',
-                        icon: AlertCircle,
-                        variant: 'ghost',
-                      },
-                    ]}
-                  />
-                </ResizablePanel>
-                <ResizableHandle withHandle />
-                <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
-                  {children}
-                </ResizablePanel>
-                <ResizableHandle withHandle />
-                <ResizablePanel defaultSize={defaultLayout[2]}>
-                  {/* <MailDisplay mail={mails} /> */}
-                </ResizablePanel>
-              </ResizablePanelGroup>
-            </TooltipProvider>
-          </div>
+                </div>
+                <Separator />
+                <Nav
+                  isCollapsed={isCollapsed}
+                  links={[
+                    {
+                      title: 'Produtos',
+                      label: '128',
+                      href: '/products',
+                      icon: Box,
+                      variant: 'default',
+                    },
+                    {
+                      title: 'Vendas',
+                      label: '0',
+                      href: '/dashboard',
+                      icon: Banknote,
+                      variant: 'ghost',
+                    },
+                  ]}
+                />
+                <Separator />
+                <Nav
+                  isCollapsed={isCollapsed}
+                  links={[
+                    {
+                      title: 'Usuários',
+                      label: '2',
+                      href: '#',
+                      icon: Users2,
+                      variant: 'ghost',
+                    },
+                    {
+                      title: 'Updates',
+                      label: '0',
+                      href: '#',
+                      icon: AlertCircle,
+                      variant: 'ghost',
+                    },
+                  ]}
+                />
+              </ResizablePanel>
+              <ResizableHandle withHandle />
+              <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
+                {children}
+              </ResizablePanel>
+            </ResizablePanelGroup>
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

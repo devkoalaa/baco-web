@@ -83,12 +83,14 @@ export default function MailPage() {
                 {
                   title: 'Produtos',
                   label: '128',
+                  href: '#',
                   icon: Box,
                   variant: 'default',
                 },
                 {
                   title: 'Vendas',
                   label: '0',
+                  href: '#',
                   icon: Banknote,
                   variant: 'ghost',
                 },
@@ -101,12 +103,14 @@ export default function MailPage() {
                 {
                   title: 'Usuários',
                   label: '2',
+                  href: '#',
                   icon: Users2,
                   variant: 'ghost',
                 },
                 {
                   title: 'Updates',
                   label: '0',
+                  href: '#',
                   icon: AlertCircle,
                   variant: 'ghost',
                 },
