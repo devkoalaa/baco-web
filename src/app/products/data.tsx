@@ -4,12 +4,14 @@ export const products = [
     name: 'Tabaco Bolado',
     text: 'Tabaco Royal bolado na seda Papelito',
     labels: ['Fumável'],
+    selected: true
   },
   {
     id: '110e8400-e29b-11d4-a716-446655440000',
     name: 'Isqueiro Bic',
     text: 'Isqueiro simples de cores variadas',
     labels: ['Acessório'],
+    selected: false
   },
 ]
 

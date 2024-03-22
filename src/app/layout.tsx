@@ -16,6 +16,7 @@ import { AccountSwitcher } from '@/components/account-switcher'
 import { Nav } from '@/components/nav'
 import { accounts } from '@/utils/data'
 import { getCookie } from '@/utils/getCookie'
+import { usePathname  } from 'next/navigation'
 
 export const fontSans = FontSans({
   subsets: ['latin'],
@@ -29,14 +30,14 @@ export default function RootLayout({
 }>) {
   const navCollapsedSize = 4
   const layoutCookie = JSON.parse(getCookie('react-resizable-panels:layout'))
-  const collapsedCookie = JSON.parse(
-    getCookie('react-resizable-panels:collapsed'),
-  )
+  const collapsedCookie = false
   console.log('collapsedCookie', collapsedCookie)
   console.log('collapsedCookie typeof', typeof collapsedCookie)
   const defaultLayout = layoutCookie
   const defaultCollapsed = false
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed)
+  
+  console.log('AAAAAAAAAAAAAAAAAAA', usePathname())
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -78,7 +79,7 @@ export default function RootLayout({
                 }}
                 className={cn(
                   isCollapsed &&
-                    'min-w-[50px] transition-all duration-300 ease-in-out',
+                  'min-w-[50px] transition-all duration-300 ease-in-out',
                 )}
               >
                 <div
@@ -101,14 +102,14 @@ export default function RootLayout({
                       label: '128',
                       href: '/products',
                       icon: Box,
-                      variant: 'default',
+                      variant: usePathname() == '/products' ? 'default' : 'ghost',
                     },
                     {
                       title: 'Vendas',
                       label: '0',
                       href: '/dashboard',
                       icon: Banknote,
-                      variant: 'ghost',
+                      variant: usePathname() == '/dashboard' ? 'default' : 'ghost',
                     },
                   ]}
                 />
