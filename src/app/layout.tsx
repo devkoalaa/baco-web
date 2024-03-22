@@ -1,4 +1,6 @@
 'use client'
+import { AccountSwitcher } from '@/components/account-switcher'
+import { Nav } from '@/components/nav'
 import { ThemeProvider } from '@/components/theme-provider'
 import {
   ResizableHandle,
@@ -7,16 +9,14 @@ import {
 } from '@/components/ui/resizable'
 import { Separator } from '@/components/ui/separator'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { AlertCircle, Banknote, Box, Users2 } from 'lucide-react'
-import { Inter as FontSans } from 'next/font/google'
-import { ReactNode, useState } from 'react'
-import '../app/globals.css'
-import { cn } from '../lib/utils'
-import { AccountSwitcher } from '@/components/account-switcher'
-import { Nav } from '@/components/nav'
 import { accounts } from '@/utils/data'
 import { getCookie } from '@/utils/getCookie'
-import { usePathname  } from 'next/navigation'
+import { AlertCircle, Banknote, Box, Users2 } from 'lucide-react'
+import { Inter as FontSans } from 'next/font/google'
+import { usePathname } from 'next/navigation'
+import { ReactNode, useEffect, useState } from 'react'
+import '../app/globals.css'
+import { cn } from '../lib/utils'
 
 export const fontSans = FontSans({
   subsets: ['latin'],
@@ -29,15 +29,21 @@ export default function RootLayout({
   children: ReactNode
 }>) {
   const navCollapsedSize = 4
-  const layoutCookie = JSON.parse(getCookie('react-resizable-panels:layout'))
-  const collapsedCookie = false
-  console.log('collapsedCookie', collapsedCookie)
-  console.log('collapsedCookie typeof', typeof collapsedCookie)
-  const defaultLayout = layoutCookie
-  const defaultCollapsed = false
-  const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed)
-  
-  console.log('AAAAAAAAAAAAAAAAAAA', usePathname())
+  const [layout, setLayout] = useState<number[]>([265, 440, 655])
+  const [isCollapsed, setIsCollapsed] = useState(false)
+
+  useEffect(() => {
+    const layout = JSON.parse(
+      getCookie('react-resizable-panels:layout', 'number[]'),
+    )
+    if (layout) setLayout(layout)
+
+    const isCollapsed = JSON.parse(
+      getCookie('react-resizable-panels:collapsed', 'boolean'),
+    )
+    console.log(isCollapsed)
+    if (isCollapsed) setIsCollapsed(isCollapsed)
+  }, [])
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -66,7 +72,7 @@ export default function RootLayout({
               className="h-full max-h-[800px] items-stretch"
             >
               <ResizablePanel
-                defaultSize={defaultLayout[0]}
+                defaultSize={layout[0]}
                 collapsedSize={navCollapsedSize}
                 collapsible={true}
                 minSize={15}
@@ -79,7 +85,7 @@ export default function RootLayout({
                 }}
                 className={cn(
                   isCollapsed &&
-                  'min-w-[50px] transition-all duration-300 ease-in-out',
+                    'min-w-[50px] transition-all duration-300 ease-in-out',
                 )}
               >
                 <div
@@ -102,14 +108,16 @@ export default function RootLayout({
                       label: '128',
                       href: '/products',
                       icon: Box,
-                      variant: usePathname() == '/products' ? 'default' : 'ghost',
+                      variant:
+                        usePathname() == '/products' ? 'default' : 'ghost',
                     },
                     {
                       title: 'Vendas',
                       label: '0',
                       href: '/dashboard',
                       icon: Banknote,
-                      variant: usePathname() == '/dashboard' ? 'default' : 'ghost',
+                      variant:
+                        usePathname() == '/dashboard' ? 'default' : 'ghost',
                     },
                   ]}
                 />
@@ -135,7 +143,7 @@ export default function RootLayout({
                 />
               </ResizablePanel>
               <ResizableHandle withHandle />
-              <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
+              <ResizablePanel defaultSize={layout[1]} minSize={30}>
                 {children}
               </ResizablePanel>
             </ResizablePanelGroup>
